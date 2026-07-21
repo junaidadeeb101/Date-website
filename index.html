@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Will You Go on a Date With Me Pooku?</title>
+
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --background-one: #fff9fc;
+      --background-two: #ffe9f1;
+      --card: rgba(244, 255, 247, 0.95);
+      --text: #401c2b;
+      --pink: #d56791;
+      --pink-hover: #c55280;
+      --purple: #9461aa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at top left,
+          #ffffff 0%,
+          transparent 35%
+        ),
+        linear-gradient(
+          135deg,
+          var(--background-one),
+          var(--background-two)
+        );
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    /* Confetti canvas */
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    /* Main container */
+
+    .experience {
+      position: relative;
+      display: grid;
+      min-height: 100svh;
+      place-items: center;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .experience::before {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(
+        rgba(95, 42, 65, 0.08) 0.7px,
+        transparent 0.7px
+      );
+      background-size: 6px 6px;
+      content: "";
+      pointer-events: none;
+    }
+
+    /* Background decorations */
+
+    .decorations {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .decorations span {
+      position: absolute;
+      color: rgba(181, 83, 121, 0.45);
+      font-size: 18px;
+      animation: floating 6s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+      0%,
+      100% {
+        opacity: 0.35;
+        transform: translateY(0) rotate(-5deg);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: translateY(-15px) rotate(6deg);
+      }
+    }
+
+    /* Main card */
+
+    .card {
+      position: relative;
+      z-index: 2;
+      width: min(720px, 94vw);
+      min-height: 430px;
+      overflow: hidden;
+      border: 1px solid rgba(119, 154, 133, 0.18);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: 0 22px 55px rgba(89, 45, 64, 0.14);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Panels */
+
+    .panel {
+      display: none;
+      min-height: 430px;
+      align-items: center;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 48px;
+      text-align: center;
+    }
+
+    .panel.active {
+      display: flex;
+      animation: panelEntrance 0.45s ease;
+    }
+
+    @keyframes panelEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.1;
+    }
+
+    p {
+      margin: 17px 0 24px;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    /* pooku image */
+
+    .pooku {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 25px;
+      border-radius: 25px;
+      object-fit: cover;
+      transform: rotate(-90deg);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Buttons */
+
+    .primary-button,
+    .no-button {
+      border: none;
+      border-radius: 999px;
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 9px 20px rgba(175, 68, 111, 0.22);
+      transition:
+        background 0.16s ease,
+        transform 0.16s ease,
+        box-shadow 0.16s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .primary-button {
+      min-width: 155px;
+      padding: 15px 28px;
+      background: linear-gradient(
+        135deg,
+        #dc769e,
+        var(--pink)
+      );
+      font-size: 17px;
+    }
+
+    .primary-button:hover:not(:disabled) {
+      background: var(--pink-hover);
+      box-shadow: 0 12px 25px rgba(175, 68, 111, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .primary-button:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .primary-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    /* First screen buttons */
+
+    .button-zone {
+      position: relative;
+      width: min(430px, 100%);
+      height: 125px;
+      margin-top: 15px;
+      touch-action: none;
+    }
+
+    #yesButton {
+      position: absolute;
+      top: 50%;
+      left: 20%;
+      transform: translateY(-50%);
+    }
+
+    .no-button {
+      position: absolute;
+      top: 50%;
+      left: 62%;
+      width: 95px;
+      min-height: 49px;
+      padding: 12px 20px;
+      background: linear-gradient(
+        135deg,
+        #a775b9,
+        var(--purple)
+      );
+      transform: translateY(-50%);
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.65;
+    }
+
+    /* Surprise screen */
+
+    .pickle-tile {
+      display: grid;
+      width: 110px;
+      height: 110px;
+      margin-bottom: 28px;
+      place-items: center;
+      border-radius: 24px;
+      background: #bc302c;
+      box-shadow: 0 12px 25px rgba(106, 32, 36, 0.2);
+      font-size: 58px;
+    }
+    .pickle-tile img {
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  object-fit: cover;
+}
+
+    /* Schedule form */
+
+    .schedule-panel {
+      align-items: stretch;
+      padding: 30px 48px 42px;
+      text-align: left;
+    }
+
+    .schedule-panel h1 {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .calendar-icon {
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 46px;
+    }
+
+    .schedule-panel label {
+      margin: 0 0 8px 2px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .schedule-panel input,
+    .schedule-panel select {
+      width: 100%;
+      height: 58px;
+      margin-bottom: 20px;
+      border: 1.5px solid rgba(73, 45, 58, 0.38);
+      border-radius: 10px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.65);
+      color: var(--text);
+      padding: 0 17px;
+      font-size: 17px;
+    }
+
+    .schedule-panel input:focus,
+    .schedule-panel select:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(213, 103, 145, 0.15);
+    }
+
+    .wide-button {
+      width: 100%;
+    }
+
+    /* Food screen */
+
+    .food-panel {
+      padding: 34px 48px 43px;
+    }
+
+    .food-panel p {
+      margin: 10px 0 22px;
+    }
+
+    .food-grid {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .food-option {
+      display: flex;
+      min-height: 125px;
+      align-items: center;
+      border: 1.5px solid transparent;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.55);
+      color: var(--text);
+      cursor: pointer;
+      flex-direction: column;
+      font-size: 17px;
+      gap: 12px;
+      justify-content: center;
+      transition:
+        border-color 0.16s ease,
+        background 0.16s ease,
+        transform 0.16s ease;
+    }
+
+    .food-option span {
+      font-size: 36px;
+    }
+
+    .food-option:hover,
+    .food-option.selected {
+      border-color: #92516b;
+      background: rgba(255, 232, 241, 0.8);
+      transform: translateY(-3px);
+    }
+
+    /* Final screen */
+
+    .final-panel h1 {
+      font-size: clamp(29px, 3.8vw, 43px);
+      line-height: 1.18;
+    }
+
+    .final-panel p {
+      max-width: 620px;
+    }
+
+    .heart-row {
+      margin: 0 0 25px;
+      color: #b96580;
+      font-size: 22px;
+      letter-spacing: 7px;
+    }
+
+    .built-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #e9682a;
+      box-shadow: 0 6px 13px rgba(121, 49, 25, 0.2);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      font-weight: bold;
+      gap: 8px;
+      padding: 8px 15px 8px 8px;
+    }
+
+    .built-badge span {
+      display: grid;
+      width: 29px;
+      height: 29px;
+      place-items: center;
+      border-radius: 50%;
+      background: #35292b;
+    }
+
+    /* Mobile responsiveness */
+
+    @media (max-width: 650px) {
+      .experience {
+        padding: 14px;
+      }
+
+      .card {
+        width: 94vw;
+        border-radius: 23px;
+      }
+
+      .panel {
+        min-height: 520px;
+        padding: 30px 21px;
+      }
+
+      h1 {
+        font-size: clamp(28px, 8vw, 38px);
+      }
+
+      .button-zone {
+        height: 145px;
+      }
+
+      #yesButton {
+        left: 10%;
+      }
+
+      .no-button {
+        left: 62%;
+      }
+
+      .schedule-panel {
+        padding: 25px 21px 30px;
+      }
+
+      .food-panel {
+        padding: 28px 16px;
+      }
+
+      .food-grid {
+        gap: 8px;
+      }
+
+      .food-option {
+        min-height: 125px;
+        font-size: 15px;
+      }
+
+      .final-panel h1 {
+        font-size: clamp(27px, 7vw, 35px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 1ms !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <main class="experience">
+
+    <!-- Background decorations -->
+
+    <div class="decorations" aria-hidden="true">
+      <span style="left: 8%; top: 12%;">✿</span>
+      <span style="left: 18%; top: 80%; animation-delay: 2s;">♥</span>
+      <span style="left: 32%; top: 16%; animation-delay: 4s;">✦</span>
+      <span style="left: 45%; top: 89%; animation-delay: 1s;">❀</span>
+      <span style="left: 61%; top: 8%; animation-delay: 5s;">♥</span>
+      <span style="left: 74%; top: 74%; animation-delay: 3s;">✧</span>
+      <span style="left: 88%; top: 20%;">❀</span>
+      <span style="left: 93%; top: 87%; animation-delay: 4s;">♥</span>
+    </div>
+
+    <section class="card">
+
+      <!-- Screen 1: Invitation -->
+
+      <div id="invitePanel" class="panel active">
+
+         <img
+          class="pooku"
+          src="my image.jpg"
+          alt="My image"
+        >
+
+        <h1>
+          🌸 Will you go on a date with me Pooku? 🌸
+        </h1>
+
+        <div class="button-zone" id="buttonZone">
+
+          <button
+            type="button"
+            id="yesButton"
+            class="primary-button"
+          >
+            YES 🫶🏻
+          </button>
+
+          <button
+            type="button"
+            id="noButton"
+            class="no-button"
+          >
+            no 🖕🏻
+          </button>
+
+        </div>
+
+        <p class="hint">
+          Show your aukat and say "no" 🫦
+        </p>
+
+      </div>
+
+      <!-- Screen 2: Surprise -->
+
+      <div id="surprisePanel" class="panel">
+
+        <div class="pickle-tile">
+           <img src="surprise.jpg" alt="Surprise picture">
+        </div><br>
+
+        <h1>
+          Huh, I Made It Happen,<br>
+          To Hear Your "YES" 😭
+        </h1>
+
+        <p>Chaileo "no" bolte parta na kintu 👀</p>
+
+        <button
+          type="button"
+          id="continueButton"
+          class="primary-button"
+        >
+          Dhong Jotto 🙄<br>
+          ⏭
+        </button>
+
+      </div>
+
+      <!-- Screen 3: Schedule -->
+
+      <form id="schedulePanel" class="panel schedule-panel">
+
+        <div class="calendar-icon">📅🐾</div>
+
+        <h1>So... Kobe Jacchi bolo?</h1>
+
+        <label for="dateInput">Pick a Day 📅</label>
+
+        <input
+          id="dateInput"
+          type="date"
+          required
+        >
+
+        <label for="timeInput">What Time? ⏰</label>
+
+        <select id="timeInput" required>
+
+          <option value="">Select a time...</option>
+
+          <option>12:00 PM</option>
+          <option>12:30 PM</option>
+          <option>1:00 PM</option>
+          <option>1:30 PM</option>
+          <option>2:00 PM</option>
+          <option>2:30 PM</option>
+          <option>3:00 PM</option>
+          <option>3:30 PM</option>
+          <option>4:00 PM</option>
+          <option>4:30 PM</option>
+          <option>5:00 PM</option>
+          <option>5:30 PM</option>
+          <option>6:00 PM</option>
+          <option>6:30 PM</option>
+          <option>7:00 PM</option>
+          <option>7:30 PM</option>
+          <option>8:00 PM</option>
+          <option>8:30 PM</option>
+          <option>9:00 PM</option>
+
+        </select>
+
+        <button
+          id="scheduleButton"
+          type="submit"
+          class="primary-button wide-button"
+          disabled
+        >
+          set the date! ♥
+        </button>
+
+      </form>
+
+      <!-- Screen 4: Food selection -->
+
+      <div id="foodPanel" class="panel food-panel">
+
+        <h1>Accha ki Khaba Bolo? 🍴✨</h1>
+
+        <p>Weird Kichu Chose koiro na FOR GOD SAKE🙏</p>
+
+        <div class="food-grid">
+
+          <button type="button" class="food-option" data-food="Pizza">
+            <span>🍲</span>
+            Chui-Jhal Mangsho
+          </button>
+
+          <button type="button" class="food-option" data-food="Sushi">
+            <span>🍗</span>
+            Chicken Fry
+          </button>
+
+          <button type="button" class="food-option" data-food="Burgers">
+            <span>🙆🏽‍♂️</span>
+            Amar Matha
+          </button>
+
+          <button type="button" class="food-option" data-food="Pasta">
+            <span>🦖</span>
+            Dinosaur
+          </button>
+
+          <button type="button" class="food-option" data-food="Tacos">
+            <span>🍫</span>
+            Choco
+          </button>
+
+          <button type="button" class="food-option" data-food="Ramen">
+            <span>🥘</span>
+            Khichuri
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- Screen 5: Final message -->
+
+      <div id="finalPanel" class="panel final-panel">
+
+        <h1>
+          Accha Tahole Be ready by
+          <span id="selectedTime">6</span>,
+          I'm coming to get you, 😶<br>
+          Age bidesh theke ashe nei daraw✈️
+        </h1>
+
+        <p>
+          <em>
+            BTW Deshe eshe tomar Pre-Birthday celebrate krbo Agei bole dilam.<br>
+            Ava & Habiba ke Ready thakte boilo.
+          </em>
+        </p>
+
+        <div class="heart-row">
+          ♥ ♥ ♥ ♥ ♥
+        </div>
+
+        <div class="built-badge">
+          <span>🎀</span>
+          I Love You My Pookie Cutu
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    /* Elements */
+
+    const panels = document.querySelectorAll(".panel");
+
+    const invitePanel = document.getElementById("invitePanel");
+    const surprisePanel = document.getElementById("surprisePanel");
+    const schedulePanel = document.getElementById("schedulePanel");
+    const foodPanel = document.getElementById("foodPanel");
+    const finalPanel = document.getElementById("finalPanel");
+
+    const buttonZone = document.getElementById("buttonZone");
+    const yesButton = document.getElementById("yesButton");
+    const noButton = document.getElementById("noButton");
+    const continueButton = document.getElementById("continueButton");
+
+    const dateInput = document.getElementById("dateInput");
+    const timeInput = document.getElementById("timeInput");
+    const scheduleButton = document.getElementById("scheduleButton");
+    const selectedTime = document.getElementById("selectedTime");
+
+    /* Change screens */
+
+    function showPanel(panel) {
+      panels.forEach(function(currentPanel) {
+        currentPanel.classList.remove("active");
+      });
+
+      panel.classList.add("active");
+    }
+
+    /* Set minimum date to today */
+
+    dateInput.min = new Date().toISOString().split("T")[0];
+
+    /* Confetti */
+
+    const confettiCanvas =
+      document.getElementById("confettiCanvas");
+
+    function resizeConfettiCanvas() {
+      const devicePixelRatio =
+        Math.max(1, window.devicePixelRatio || 1);
+
+      confettiCanvas.width =
+        Math.floor(window.innerWidth * devicePixelRatio);
+
+      confettiCanvas.height =
+        Math.floor(window.innerHeight * devicePixelRatio);
+
+      confettiCanvas.style.width = "100vw";
+      confettiCanvas.style.height = "100vh";
+    }
+
+    resizeConfettiCanvas();
+
+    window.addEventListener(
+      "resize",
+      resizeConfettiCanvas
+    );
+
+    let confettiInstance;
+
+    if (typeof confetti !== "undefined") {
+      confettiInstance = confetti.create(
+        confettiCanvas,
+        {
+          resize: false,
+          useWorker: true
+        }
+      );
+    }
+
+    function launchConfetti() {
+      if (!confettiInstance) {
+        return;
+      }
+
+      const endTime = Date.now() + 1400;
+
+      function frame() {
+        confettiInstance({
+          particleCount: 10,
+          spread: 90,
+          startVelocity: 42,
+          ticks: 180,
+          origin: {
+            x: Math.random(),
+            y: Math.random() * 0.35
+          }
+        });
+
+        if (Date.now() < endTime) {
+          requestAnimationFrame(frame);
+        }
+      }
+
+      frame();
+
+      setTimeout(function() {
+        confettiInstance({
+          particleCount: 250,
+          spread: 145,
+          startVelocity: 58,
+          ticks: 220,
+          origin: {
+            x: 0.5,
+            y: 0.55
+          }
+        });
+      }, 250);
+    }
+
+    /* Moving no button */
+
+    let yesButtonScale = 1;
+
+    function growYesButton() {
+      yesButtonScale =
+        Math.min(1.8, yesButtonScale + 0.08);
+
+      yesButton.style.transform =
+        "translateY(-50%) scale(" +
+        yesButtonScale +
+        ")";
+    }
+
+    function clamp(number, minimum, maximum) {
+      return Math.max(
+        minimum,
+        Math.min(maximum, number)
+      );
+    }
+
+    function moveNoButton(pointerX, pointerY) {
+      const zoneRectangle =
+        buttonZone.getBoundingClientRect();
+
+      const buttonRectangle =
+        noButton.getBoundingClientRect();
+
+      let directionX =
+        buttonRectangle.left +
+        buttonRectangle.width / 2 -
+        pointerX;
+
+      let directionY =
+        buttonRectangle.top +
+        buttonRectangle.height / 2 -
+        pointerY;
+
+      const magnitude =
+        Math.hypot(directionX, directionY) || 1;
+
+      directionX = directionX / magnitude;
+      directionY = directionY / magnitude;
+
+      let newLeft =
+        buttonRectangle.left -
+        zoneRectangle.left +
+        directionX * 145;
+
+      let newTop =
+        buttonRectangle.top -
+        zoneRectangle.top +
+        directionY * 145;
+
+      newLeft = clamp(
+        newLeft,
+        0,
+        zoneRectangle.width -
+        buttonRectangle.width
+      );
+
+      newTop = clamp(
+        newTop,
+        0,
+        zoneRectangle.height -
+        buttonRectangle.height
+      );
+
+      noButton.style.left = newLeft + "px";
+      noButton.style.top = newTop + "px";
+      noButton.style.transform = "none";
+
+      growYesButton();
+    }
+
+    buttonZone.addEventListener(
+      "pointermove",
+      function(event) {
+        const buttonRectangle =
+          noButton.getBoundingClientRect();
+
+        const distance = Math.hypot(
+          buttonRectangle.left +
+          buttonRectangle.width / 2 -
+          event.clientX,
+
+          buttonRectangle.top +
+          buttonRectangle.height / 2 -
+          event.clientY
+        );
+
+        if (distance < 135) {
+          moveNoButton(
+            event.clientX,
+            event.clientY
+          );
+        }
+      }
+    );
+
+    noButton.addEventListener(
+      "pointerdown",
+      function(event) {
+        event.preventDefault();
+
+        moveNoButton(
+          event.clientX,
+          event.clientY
+        );
+      }
+    );
+
+    noButton.addEventListener(
+      "click",
+      function(event) {
+        event.preventDefault();
+      }
+    );
+
+    /* Yes button */
+
+    yesButton.addEventListener(
+      "click",
+      function() {
+        showPanel(surprisePanel);
+        resizeConfettiCanvas();
+        launchConfetti();
+      }
+    );
+
+    /* Continue button */
+
+    continueButton.addEventListener(
+      "click",
+      function() {
+        showPanel(schedulePanel);
+      }
+    );
+
+    /* Enable schedule button */
+
+    function updateScheduleButton() {
+      scheduleButton.disabled =
+        !(dateInput.value && timeInput.value);
+    }
+
+    dateInput.addEventListener(
+      "input",
+      updateScheduleButton
+    );
+
+    timeInput.addEventListener(
+      "change",
+      updateScheduleButton
+    );
+
+    /* Submit date and time */
+
+    schedulePanel.addEventListener(
+      "submit",
+      function(event) {
+        event.preventDefault();
+
+        if (dateInput.value && timeInput.value) {
+          showPanel(foodPanel);
+        }
+      }
+    );
+
+    /* Food selection */
+
+    const foodButtons =
+      document.querySelectorAll(".food-option");
+
+    foodButtons.forEach(function(foodButton) {
+      foodButton.addEventListener(
+        "click",
+        function() {
+          foodButtons.forEach(function(button) {
+            button.classList.remove("selected");
+          });
+
+          foodButton.classList.add("selected");
+
+          const shortTime =
+            timeInput.value
+              .replace(":00", "")
+              .replace(" AM", "")
+              .replace(" PM", "");
+
+          selectedTime.textContent =
+            shortTime || "6";
+
+          setTimeout(function() {
+            showPanel(finalPanel);
+            launchConfetti();
+          }, 500);
+        }
+      );
+    });
+  </script>
+
+</body>
+</html>
